@@ -18,4 +18,4 @@ This program is still in it's basic forms...<br>
 <li>Make small spheres (.025,5,5) at these locations</li>
 <li>change colours depending on atom type</li>
 <li>allow user to move around rendered structure</li>
-</ul)
+</ul>
