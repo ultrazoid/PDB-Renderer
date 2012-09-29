@@ -4,7 +4,6 @@ Created on Sep 28, 2012
 @author: emerson
 '''
 import string
-import os
 
 def get(Filename):
     fileOpen = open(Filename, 'r')

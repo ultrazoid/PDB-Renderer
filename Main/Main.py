@@ -42,7 +42,8 @@ print "Data ready!"
 cInput = raw_input("Continue?(y/n)")
 if pInput == 'Y':
     print "PDB Renderer will now render the data"
-    render.draw(darter)
+    coordData = render.coords(darter)
+    render.draw(coordData)
 if pInput == 'N':
     print "User has chosen not to continue"
     print "PDB Renderer with now exit"
