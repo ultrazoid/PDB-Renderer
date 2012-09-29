@@ -3,7 +3,7 @@ PDB-Renderer
 
 A Python based .pdb file renderer using pyOpenGL<br>
 This program is still in it's basic forms...<br><br>
-All PDB files are found here: <a href="www.pdb.org">Protein Data Bank</a>
+All PDB files are found here: <a href="www.pdb.org">Protein Data Bank</a><br>
 Documentation for PDB files can be found here: <a href="http://www.wwpdb.org/documentation/format33/v3.3.html">Atomic Coordinate Entry Format Description</a><br>
 And, Documentation on the OpenGL Coordinates can be found here: <a href="http://www.wwpdb.org/documentation/format33/sect9.html#ATOM">Coordinate Section: ATOM</a>
 
