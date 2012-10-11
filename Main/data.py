@@ -8,6 +8,9 @@ import string
 def get(Filename):
     fileOpen = open(Filename, 'r')
     fileGot = fileOpen.readlines()
+    fileOpe = open('swamp.txt','w')
+    fileOpe.write(Filename)
+    fileOpe.close()
     return fileGot
 
 def clean(ProccessedList):
