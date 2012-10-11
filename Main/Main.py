@@ -23,6 +23,7 @@ class Spectator:
         aspect = w/h
         gluPerspective(fov, aspect, 0.001, 100000.0);
         glMatrixMode(GL_MODELVIEW)
+        pygame.mouse.set_cursor(*pygame.cursors.load_xbm('cursor.xbm','cursor_mask.xbm'))
 
     def simple_lights(self):
         glEnable(GL_LIGHTING)
@@ -43,7 +44,7 @@ class Spectator:
         """ Draw a simple object (optional) """
         for coord in stal:
             glTranslatef(coord[0],coord[1],coord[2])
-            glutSolidSphere(0.25,16,16)
+            glutSolidSphere(0.25,32,32)
         
 
     def loop(self):
@@ -119,15 +120,20 @@ if pInput == 'Y':
     width = int(raw_input('Please enter a window width:'))
     height = int(raw_input('Please enter a window height:'))
     print "PDB Renderer will now render the data"
-    print "Press Z to exit!"
+    print "Close window to exit!"
     coordData = render.coords(darter)
     fps = Spectator(width, height, 50)
     fps.simple_lights()
     while fps.loop():
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                os.sys.exit()
+            if event.type != pygame.QUIT:
+                print event
+                break
         fps.draw_mole(coordData)
         fps.simple_camera_pose()
         fps.controls_3d(0,'w','s','a','d','q','e')
-        if fps.keys['z']: os.sys.exit()
 if pInput == 'N':
     print "User has chosen not to continue"
     print "PDB Renderer with now exit"
