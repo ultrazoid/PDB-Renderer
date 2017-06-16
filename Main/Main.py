@@ -72,19 +72,16 @@ class Spectator:
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         return True
 
-    def controls_3d(self,mouse_button=1,w_key='w',s_key='s',a_key='a',d_key='d',q_key='q',e_key='e'):
+    def controls_3d(self,mouse_button, w_key, s_key, a_key, d_key, q_key, e_key, cameraView):
         """ The actual camera setting cycle """
         mouse_dx,mouse_dy = pygame.mouse.get_rel()
         if pygame.mouse.get_pressed()[mouse_button]:
             look_speed = 1
-            buffer = glGetDoublev(GL_MODELVIEW_MATRIX)
-            c = (-1 * numpy.mat(buffer[:3,:3]) * \
-                numpy.mat(buffer[3,:3]).T).reshape(3,1)
-            print(c)
+            
             # c is camera center in absolute coordinates, 
             # we need to move it back to (0,0,0) 
             # before rotating the camera
-            glTranslate(c[0],c[1],c[2])
+            glTranslate(cameraView[0],cameraView[1],cameraView[2])
             m = buffer.flatten()
             glRotate(mouse_dx * look_speed, m[1],m[5],m[9])
             glRotate(mouse_dy * look_speed, m[0],m[4],m[8])
@@ -92,7 +89,7 @@ class Spectator:
             # compensate roll
             glRotated(-math.atan2(-m[4],m[5]) * \
                 57.295779513082320876798154814105 ,m[2],m[6],m[10])
-            glTranslate(-c[0],-c[1],-c[2])
+            glTranslate(-cameraView[0],-cameraView[1],-cameraView[2])
 
         # move forward-back or right-left
         # fwd =   .1 if 'w' is pressed;   -0.1 if 's'
@@ -178,6 +175,16 @@ while cont == False:
 
 pInput = string.upper(raw_input("File Loaded! Would you like to prepare it for rendering?(y/n)"))
 if pInput == 'Y':
+    cont = False
+    while cont == False:
+        numInput = str(raw_input("Please input point size as a float less than 1:"))
+        if "0." in numInput:
+            print("Size recognised")
+            cont = True
+        elif "0." not in numInput:
+            print("You didn't enter a float less than 1. Try Again")
+            cont = False
+    sizeConv = float(numInput)
     print("PDB Renderer will now prepare the data")
     darter = data.clean(dart)
     forge = extStrip(fInput)
@@ -199,7 +206,7 @@ if pInput == 'Y':
         noot.append(str(atom))
     for babe in noot:
         point = map(lambda x: float(x), babe[1:-2].split())
-        cube(point[0], point[1], point[2], 0.15, heckler)    
+        cube(point[0], point[1], point[2], sizeConv, heckler)    
     heckler.close()
 
 if pInput == 'N':
@@ -220,14 +227,17 @@ if pInput == 'Y':
     fps.simple_camera_pose()
     fps.draw_mole(coordData)
     fps.simple_camera_pose()
+    buffer = glGetDoublev(GL_MODELVIEW_MATRIX)
+    c = (-1 * numpy.mat(buffer[:3,:3]) * numpy.mat(buffer[3,:3]).T).reshape(3,1)
     while fps.loop():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 os.sys.exit()
             if event.type != pygame.QUIT:
                 print(event)
+                print(c)
                 break
-        fps.controls_3d(0,'w','s','a','d','q','e')
+        fps.controls_3d(1,'w','s','a','d','q','e',c)
 
 if pInput == 'N':
     print("User has chosen not to continue")
