@@ -13,6 +13,17 @@ import pygame, math, numpy
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
+import camera
+import spatial
+import vecmath
+
+def extStrip(pdb):
+    heck = pdb
+    mid = heck[:-4]
+    print mid
+    new = mid + ".txt"
+    print new
+    return new
 
 class Spectator:
     def __init__(self, w, h, fov):
@@ -43,8 +54,11 @@ class Spectator:
     def draw_mole(self, stal):
         """ Draw a simple object (optional) """
         for coord in stal:
+            print coord
             glTranslatef(coord[0],coord[1],coord[2])
+            print "Translating..."
             glutSolidSphere(0.25,32,32)
+            print "Drawing"
         
 
     def loop(self):
@@ -59,10 +73,11 @@ class Spectator:
         """ The actual camera setting cycle """
         mouse_dx,mouse_dy = pygame.mouse.get_rel()
         if pygame.mouse.get_pressed()[mouse_button]:
-            look_speed = .2
+            look_speed = 1
             buffer = glGetDoublev(GL_MODELVIEW_MATRIX)
             c = (-1 * numpy.mat(buffer[:3,:3]) * \
                 numpy.mat(buffer[3,:3]).T).reshape(3,1)
+            print c
             # c is camera center in absolute coordinates, 
             # we need to move it back to (0,0,0) 
             # before rotating the camera
@@ -87,6 +102,7 @@ class Spectator:
             glTranslate(fwd*m[2],fwd*m[6],fwd*m[10])
             glTranslate(strafe*m[0],strafe*m[4],strafe*m[8])
             glTranslate(verti*m[1],verti*m[5],verti*m[9])
+
 print "Welcome to ultrazoid_'s PDB renderer: Mac OS X Edition"
 
 cont = False
@@ -106,24 +122,41 @@ while cont == False:
         print "The filename you entered is not a PDB file..."
         print "Did you forget about the extension?"
         cont = False
+
 pInput = string.upper(raw_input("File Loaded! Would you like to prepare it for rendering?(y/n)"))
 if pInput == 'Y':
     print "PDB Renderer will now prepare the data"
     darter = data.clean(dart)
+    forge = extStrip(fInput)
+    print forge
+    heckler = open(forge, "w")
+    for lline in darter:
+        print lline
+    coordData = render.coords(darter)
+    for atom in coordData:
+        print atom
+        print "Saving to text File"
+        heckler.write(str(atom) + "\n")
+    heckler.close()
+
 if pInput == 'N':
     print "User has chosen not to continue"
-    print "PDB Renderer with now exit"
+    print "PDB Renderer will now exit"
     os.sys.exit()
+
 print "Data ready!"
 cInput = raw_input("Continue?(y/n)")
+
 if pInput == 'Y':
-    width = int(raw_input('Please enter a window width:'))
-    height = int(raw_input('Please enter a window height:'))
+    #width = int(raw_input('Please enter a window width:'))
+    #height = int(raw_input('Please enter a window height:'))
     print "PDB Renderer will now render the data"
     print "Close window to exit!"
-    coordData = render.coords(darter)
-    fps = Spectator(width, height, 50)
+    fps = Spectator(1280, 750, 115)
     fps.simple_lights()
+    fps.simple_camera_pose()
+    fps.draw_mole(coordData)
+    fps.simple_camera_pose()
     while fps.loop():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -131,12 +164,11 @@ if pInput == 'Y':
             if event.type != pygame.QUIT:
                 print event
                 break
-        fps.draw_mole(coordData)
-        fps.simple_camera_pose()
         fps.controls_3d(0,'w','s','a','d','q','e')
+
 if pInput == 'N':
     print "User has chosen not to continue"
-    print "PDB Renderer with now exit"
+    print "PDB Renderer will now exit"
     os.sys.exit()
 
         
