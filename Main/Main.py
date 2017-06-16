@@ -5,6 +5,8 @@ Created on Sep 28, 2012
 @author: emerson
 '''
 from __future__ import division
+from __future__ import print_function
+
 import string
 import data
 import render
@@ -16,13 +18,14 @@ from OpenGL.GLUT import *
 import camera
 import spatial
 import vecmath
+import sys
 
 def extStrip(pdb):
     heck = pdb
     mid = heck[:-4]
-    print mid
-    new = mid + ".txt"
-    print new
+    print(mid)
+    new = mid + ".obj"
+    print(new)
     return new
 
 class Spectator:
@@ -54,11 +57,11 @@ class Spectator:
     def draw_mole(self, stal):
         """ Draw a simple object (optional) """
         for coord in stal:
-            print coord
+            print(coord)
             glTranslatef(coord[0],coord[1],coord[2])
-            print "Translating..."
+            print("Translating...")
             glutSolidSphere(0.25,32,32)
-            print "Drawing"
+            print("Drawing")
         
 
     def loop(self):
@@ -77,7 +80,7 @@ class Spectator:
             buffer = glGetDoublev(GL_MODELVIEW_MATRIX)
             c = (-1 * numpy.mat(buffer[:3,:3]) * \
                 numpy.mat(buffer[3,:3]).T).reshape(3,1)
-            print c
+            print(c)
             # c is camera center in absolute coordinates, 
             # we need to move it back to (0,0,0) 
             # before rotating the camera
@@ -103,55 +106,115 @@ class Spectator:
             glTranslate(strafe*m[0],strafe*m[4],strafe*m[8])
             glTranslate(verti*m[1],verti*m[5],verti*m[9])
 
-print "Welcome to ultrazoid_'s PDB renderer: Mac OS X Edition"
+def print_vertex(v,ff):
+    print("v {} {} {}".format(v[0], v[1], v[2]), file=ff)
+    print_vertex.count += 1
+    return print_vertex.count
+print_vertex.count = 0
+ 
+def print_normal(v,ff):
+    print("vn {} {} {}".format(v[0], v[1], v[2]), file=ff)
+    print_normal.count += 1
+    return print_normal.count
+print_normal.count = 0
+ 
+def print_face(vertices, norm,ff):
+    out = "f"
+    for v in vertices:
+        out += " {}//{}".format(v, norm)
+    print(out, file=ff)
+ 
+
+ 
+def cube(x, y, z, size, ff):
+    ftr = print_vertex((x + size, y + size, z - size), ff)
+    ftl = print_vertex((x - size, y + size, z - size), ff)
+    fbr = print_vertex((x + size, y - size, z - size), ff)
+    fbl = print_vertex((x - size, y - size, z - size), ff)
+    btr = print_vertex((x + size, y + size, z + size), ff)
+    btl = print_vertex((x - size, y + size, z + size), ff)
+    bbr = print_vertex((x + size, y - size, z + size), ff)
+    bbl = print_vertex((x - size, y - size, z + size), ff)
+ 
+    # front
+    print_face([ftl, ftr, fbr], front, ff)
+    print_face([ftl, fbr, fbl], front, ff)
+    # back
+    print_face([btr, btl, bbl], back, ff)
+    print_face([btr, bbl, bbr], back, ff)
+    # left
+    print_face([btl, ftl, fbl], left, ff)
+    print_face([btl, fbl, bbl], left, ff)
+    # right
+    print_face([ftr, btr, bbr], right, ff)
+    print_face([ftr, bbr, fbr], right, ff)
+    # top
+    print_face([ftl, btr, ftr], top, ff)
+    print_face([ftl, btl, btr], top, ff)
+    # bottom
+    print_face([fbl, fbr, bbr], back, ff)
+    print_face([fbl, bbr, bbl], back, ff)
+
+
+print("Welcome to ultrazoid_'s PDB renderer: Mac OS X Edition")
 
 cont = False
 while cont == False:
     fInput = string.upper(raw_input("Please input the *.pdb file name you would like to render(must be in same directory):"))
     if ".PDB" in fInput:
         try:
-            print "*.pdb file recognised"
-            print "searching for file..."
+            print("*.pdb file recognised")
+            print("searching for file...")
             dart = data.get(fInput)
             cont = True
         except IOError:
-            print "File not found..."
-            print "Did you misspell the name?"
+            print("File not found...")
+            print("Did you misspell the name?")
             cont = False
     elif ".PDB" not in fInput:
-        print "The filename you entered is not a PDB file..."
-        print "Did you forget about the extension?"
+        print("The filename you entered is not a PDB file...")
+        print("Did you forget about the extension?")
         cont = False
 
 pInput = string.upper(raw_input("File Loaded! Would you like to prepare it for rendering?(y/n)"))
 if pInput == 'Y':
-    print "PDB Renderer will now prepare the data"
+    print("PDB Renderer will now prepare the data")
     darter = data.clean(dart)
     forge = extStrip(fInput)
-    print forge
+    print(forge)
     heckler = open(forge, "w")
+    top = print_normal((0, 1, 0), heckler)
+    bottom = print_normal((0, -1, 0), heckler)
+    left = print_normal((-1, 0, 0), heckler)
+    right = print_normal((1, 0, 0), heckler)
+    front = print_normal((0, 0, -1), heckler)
+    back = print_normal((0, 0, 1), heckler)
     for lline in darter:
-        print lline
+        print(lline)
     coordData = render.coords(darter)
+    noot = []
     for atom in coordData:
-        print atom
-        print "Saving to text File"
-        heckler.write(str(atom) + "\n")
+        print(atom)
+        print("Saving to obj File")
+        noot.append(str(atom))
+    for babe in noot:
+        point = map(lambda x: float(x), babe[1:-2].split())
+        cube(point[0], point[1], point[2], 0.15, heckler)    
     heckler.close()
 
 if pInput == 'N':
-    print "User has chosen not to continue"
-    print "PDB Renderer will now exit"
+    print("User has chosen not to continue")
+    print("PDB Renderer will now exit")
     os.sys.exit()
 
-print "Data ready!"
+print("Data ready!")
 cInput = raw_input("Continue?(y/n)")
 
 if pInput == 'Y':
     #width = int(raw_input('Please enter a window width:'))
     #height = int(raw_input('Please enter a window height:'))
-    print "PDB Renderer will now render the data"
-    print "Close window to exit!"
+    print("PDB Renderer will now render the data")
+    print("Close window to exit!")
     fps = Spectator(1280, 750, 115)
     fps.simple_lights()
     fps.simple_camera_pose()
@@ -162,13 +225,13 @@ if pInput == 'Y':
             if event.type == pygame.QUIT:
                 os.sys.exit()
             if event.type != pygame.QUIT:
-                print event
+                print(event)
                 break
         fps.controls_3d(0,'w','s','a','d','q','e')
 
 if pInput == 'N':
-    print "User has chosen not to continue"
-    print "PDB Renderer will now exit"
+    print("User has chosen not to continue")
+    print("PDB Renderer will now exit")
     os.sys.exit()
 
         
