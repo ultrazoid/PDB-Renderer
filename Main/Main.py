@@ -43,7 +43,6 @@ class Spectator:
         glEnable(GL_LIGHTING)
         glShadeModel(GL_SMOOTH)
         glEnable(GL_LIGHT0)
-        glLightfv(GL_LIGHT0, GL_DIFFUSE, (0.9, 0.45, 0.0, 1.0))
         glLightfv(GL_LIGHT0, GL_POSITION, (0.0, 10.0, 10.0, 10.0))
         glEnable(GL_DEPTH_TEST)
         glDepthFunc(GL_LEQUAL)
@@ -81,6 +80,7 @@ class Spectator:
             # c is camera center in absolute coordinates, 
             # we need to move it back to (0,0,0) 
             # before rotating the camera
+
             glTranslate(cameraView[0],cameraView[1],cameraView[2])
             m = buffer.flatten()
             glRotate(mouse_dx * look_speed, m[1],m[5],m[9])
@@ -93,7 +93,7 @@ class Spectator:
 
         # move forward-back or right-left
         # fwd =   .1 if 'w' is pressed;   -0.1 if 's'
-        key_speed = .001
+        key_speed = 1
         fwd = key_speed * (self.keys[w_key]-self.keys[s_key]) 
         strafe = key_speed * (self.keys[a_key]-self.keys[d_key])
         verti = key_speed * (self.keys[q_key]-self.keys[e_key])
@@ -224,10 +224,10 @@ if pInput == 'Y':
     print("Close window to exit!")
     fps = Spectator(1280, 750, 115)
     fps.simple_lights()
-    fps.simple_camera_pose()
     fps.draw_mole(coordData)
     fps.simple_camera_pose()
     buffer = glGetDoublev(GL_MODELVIEW_MATRIX)
+    print(buffer[:3,:3])
     c = (-1 * numpy.mat(buffer[:3,:3]) * numpy.mat(buffer[3,:3]).T).reshape(3,1)
     while fps.loop():
         for event in pygame.event.get():
@@ -235,7 +235,8 @@ if pInput == 'Y':
                 os.sys.exit()
             if event.type != pygame.QUIT:
                 print(event)
-                print(c)
+                print("Camera Location")
+                print(glGetDoublev(GL_MODELVIEW_MATRIX).flatten())
                 break
         fps.controls_3d(1,'w','s','a','d','q','e',c)
 
