@@ -20,11 +20,12 @@ And, Documentation on the OpenGL Coordinates can be found here: <a href="http://
 		<li>Using keyboard</li>
 	</ul>
 	<li>Make small spheres (.025,5,5) at these locations</li>
-	<li>change cursor to show orbitting capability</li>
+	<li>Change cursor to show orbitting capability</li>
 </ul>
 
 <h2>TO-DO:</h2>
 <ul>
 	<li>Move camera to a position that allows the user to view the structure</li>
-	<li>change colours depending on atom type</li>
+	<li>Change colours depending on atom type</li>
+	<li>Make Spheres Cubes instead</li>
 </ul>
